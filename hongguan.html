@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>政府统计年鉴智能分析助手</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #1abc9c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 40px;
+        }
+        
+        .feature-card {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            height: 100%;
+            border: none;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            height: 400px;
+        }
+        
+        .dashboard-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            height: 100%;
+        }
+        
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            background-color: #fafafa;
+            margin-bottom: 20px;
+        }
+        
+        .search-box {
+            border-radius: 30px;
+            padding: 12px 20px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            border-radius: 30px;
+            padding: 10px 25px;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+            border-color: #2980b9;
+        }
+        
+        .section-title {
+            position: relative;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent-color);
+        }
+        
+        footer {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background-color: white;
+            border-bottom-color: white;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: var(--dark-color);
+            font-size: 0.9rem;
+        }
+        
+        .search-tag {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-tag:hover {
+            background-color: var(--accent-color) !important;
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        /* 重新设计AI对话框样式 */
+        .message-container {
+            display: flex;
+            margin-bottom: 24px;
+            max-width: 100%;
+        }
+        
+        .user-message-container {
+            justify-content: flex-end;
+        }
+        
+        .ai-message-container {
+            justify-content: flex-start;
+        }
+        
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 12px;
+            flex-shrink: 0;
+        }
+        
+        .user-avatar {
+            background-color: var(--secondary-color);
+            color: white;
+            order: 2;
+        }
+        
+        .ai-avatar {
+            background-color: #e0e0e0;
+            color: #666;
+        }
+        
+        .message-content {
+            max-width: 75%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-message-content {
+            align-items: flex-end;
+        }
+        
+        .ai-message-content {
+            align-items: flex-start;
+        }
+        
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            line-height: 1.5;
+            word-wrap: break-word;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .user-bubble {
+            background-color: var(--secondary-color);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .ai-bubble {
+            background-color: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-actions {
+            display: flex;
+            margin-top: 8px;
+            gap: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .message-container:hover .message-actions {
+            opacity: 1;
+        }
+        
+        .message-action {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: #6c757d;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        .message-action:hover {
+            color: #495057;
+        }
+        
+        .disclaimer {
+            margin-top: 16px;
+            font-size: 12px;
+            color: #6c757d;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            padding-top: 12px;
+        }
+        
+        .thinking-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .thinking-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .thinking-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .thinking-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .thinking-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        
+        .message-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            font-size: 0.9em;
+        }
+        
+        .message-table th, .message-table td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        
+        .message-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .message-code {
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .message-block {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            margin: 12px 0;
+            overflow-x: auto;
+        }
+        
+        .btn-stop {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        
+        .btn-stop:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+        }
+        
+        .message-markdown {
+            line-height: 1.6;
+        }
+        
+        .message-markdown h1, .message-markdown h2, .message-markdown h3 {
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .message-markdown p {
+            margin-bottom: 12px;
+        }
+        
+        .message-markdown ul, .message-markdown ol {
+            margin-bottom: 12px;
+            padding-left: 24px;
+        }
+        
+        .message-markdown blockquote {
+            border-left: 4px solid #dee2e6;
+            padding-left: 12px;
+            margin: 12px 0;
+            color: #6c757d;
+        }
+        
+        .message-markdown pre {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 12px;
+            overflow-x: auto;
+            margin: 12px 0;
+        }
+        
+        .message-markdown code {
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            padding: 2px 4px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .message-markdown table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+        }
+        
+        .message-markdown th, .message-markdown td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        
+        .message-markdown th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .input-container input {
+            flex: 1;
+            border-radius: 24px;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .input-container input:focus {
+            border-color: var(--secondary-color);
+        }
+        
+        .input-container button {
+            border-radius: 24px;
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #28a745;
+        }
+        
+        .status-indicator.connecting {
+            background-color: #ffc107;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-indicator.error {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-chart-line me-2"></i>统计年鉴智能分析助手
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">功能特色</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#analysis">数据分析</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#ai-chat">AI助手</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#dashboard">指标看板</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 首页横幅 -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">精准检索各级政府统计年鉴数据</h1>
+                    <p class="lead mb-4">基于多模态大模型的智能分析系统，自动生成可视化图表与专业分析报告</p>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control search-box" id="searchInput" placeholder="输入关键词检索统计年鉴数据...">
+                        <button class="btn btn-primary" type="button" id="smartSearchBtn">智能检索</button>
+                    </div>
+                    <div class="d-flex flex-wrap">
+                        <span class="badge bg-light text-dark me-2 mb-2 p-2 search-tag" data-query="GDP数据分析">GDP数据分析</span>
+                        <span class="badge bg-light text-dark me-2 mb-2 p-2 search-tag" data-query="人口统计">人口统计</span>
+                        <span class="badge bg-light text-dark me-2 mb-2 p-2 search-tag" data-query="产业发展">产业发展</span>
+                        <span class="badge bg-light text-dark me-2 mb-2 p-2 search-tag" data-query="区域经济">区域经济</span>
+                    </div>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <!-- <img src="https://via.placeholder.com/500x300/3498db/ffffff?text=数据可视化展示" alt="数据可视化" class="img-fluid rounded shadow"> -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能特色 -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="section-title">核心功能</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h4 class="card-title">精准数据检索</h4>
+                            <p class="card-text">基于自然语言处理技术，精准检索各级政府统计年鉴数据，支持多维度筛选和高级查询。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <h4 class="card-title">智能可视化</h4>
+                            <p class="card-text">自动生成柱状图、趋势图、饼图等可视化图表，直观展示数据特征与变化趋势。</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card feature-card">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h4 class="card-title">AI智能分析</h4>
+                            <p class="card-text">多模态大模型自动分析数据，生成专业分析报告，提供宏观经济预测与行业趋势研判。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 数据分析部分 -->
+    <section id="analysis" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title">数据可视化分析</h2>
+            
+            <ul class="nav nav-tabs" id="analysisTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="trend-tab" data-bs-toggle="tab" data-bs-target="#trend" type="button">趋势分析</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button">区域对比</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="structure-tab" data-bs-toggle="tab" data-bs-target="#structure" type="button">产业结构</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="report-tab" data-bs-toggle="tab" data-bs-target="#report" type="button">分析报告</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="analysisTabsContent">
+                <div class="tab-pane fade show active" id="trend" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="chart-container">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="dashboard-card">
+                                <h5>GDP增长趋势分析</h5>
+                                <p>基于近十年统计年鉴数据，我国GDP保持稳定增长态势，年均增长率达6.5%。</p>
+                                <div class="mt-4">
+                                    <h6>关键发现：</h6>
+                                    <ul>
+                                        <li>第三产业占比持续提升</li>
+                                        <li>数字经济成为新增长点</li>
+                                        <li>区域协调发展成效显著</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="comparison" role="tabpanel">
+                    <div class="chart-container">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="structure" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <canvas id="pieChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <canvas id="barChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="report" role="tabpanel">
+                    <div class="dashboard-card">
+                        <h4 class="mb-4">《经济与产业分析简报》</h4>
+                        <div class="mb-4">
+                            <h5>执行摘要</h5>
+                            <p>基于2022年国家及各省市统计年鉴数据分析，我国经济总体呈现稳中向好态势，产业结构持续优化，创新驱动作用增强，消费对经济增长的贡献率稳步提升。</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>关键指标</h5>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <div class="stat-card">
+                                        <div class="stat-value">5.2%</div>
+                                        <div class="stat-label">GDP增长率</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stat-card">
+                                        <div class="stat-value">54.6%</div>
+                                        <div class="stat-label">第三产业占比</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stat-card">
+                                        <div class="stat-value">7.2%</div>
+                                        <div class="stat-label">居民收入增长</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="stat-card">
+                                        <div class="stat-value">4.5%</div>
+                                        <div class="stat-label">CPI涨幅</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>行业趋势研判</h5>
+                            <p>数字经济、绿色产业、高端制造等领域将成为未来经济增长的重要引擎。预计到2025年，数字经济核心产业增加值占GDP比重将达到10%以上。</p>
+                        </div>
+                        
+                        <div>
+                            <h5>政策建议</h5>
+                            <ul>
+                                <li>持续优化营商环境，激发市场主体活力</li>
+                                <li>加大科技创新投入，培育新动能</li>
+                                <li>推动区域协调发展，缩小发展差距</li>
+                                <li>促进绿色低碳转型，实现可持续发展</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI对话功能 -->
+    <section id="ai-chat" class="py-5">
+        <div class="container">
+            <h2 class="section-title">AI数据分析助手</h2>
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="chat-container" id="chatContainer">
+                        <!-- 初始AI消息 -->
+                        <div class="message-container ai-message-container">
+                            <div class="message-avatar ai-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div class="message-content ai-message-content">
+                                <div class="message-bubble ai-bubble">
+                                    您好！我是统计数据分析助手，可以帮您检索统计年鉴数据、生成可视化图表或进行经济分析。请问您需要什么帮助？
+                                </div>
+                                <div class="message-actions">
+                                    <div class="message-action" onclick="copyMessage(this)">
+                                        <i class="far fa-copy"></i>
+                                        <span>复制</span>
+                                    </div>
+                                    <div class="message-action">
+                                        <i class="far fa-thumbs-up"></i>
+                                        <span>点赞</span>
+                                    </div>
+                                    <div class="message-action">
+                                        <i class="far fa-thumbs-down"></i>
+                                        <span>点踩</span>
+                                    </div>
+                                    <div class="message-action">
+                                        <i class="fas fa-redo"></i>
+                                        <span>重新生成</span>
+                                    </div>
+                                    <div class="message-action">
+                                        <i class="fas fa-expand"></i>
+                                        <span>展开</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="disclaimer">
+                        请注意：AI生成内容可能存在不准确之处，请仔细甄别
+                    </div>
+                    <div class="api-status">
+                        <div class="status-indicator" id="apiStatus"></div>
+                        <span id="apiStatusText">您的贴心助手24小时在线</span>
+                    </div>
+                    <div class="input-container">
+                        <input type="text" id="messageInput" placeholder="输入您的问题...">
+                        <button class="btn btn-primary" type="button" id="sendMessage">
+                            <i class="fas fa-paper-plane"></i> 发送
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="dashboard-card">
+                        <h5>示例问题</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item search-tag" data-query="请分析近五年GDP增长趋势">请分析近五年GDP增长趋势</li>
+                            <li class="list-group-item search-tag" data-query="比较各省市人均可支配收入">比较各省市人均可支配收入</li>
+                            <li class="list-group-item search-tag" data-query="生成产业结构可视化图表">生成产业结构可视化图表</li>
+                            <li class="list-group-item search-tag" data-query="预测明年经济发展趋势">预测明年经济发展趋势</li>
+                            <li class="list-group-item search-tag" data-query="生成经济分析报告">生成经济分析报告</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 指标看板 -->
+    <section id="dashboard" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title">关键宏观指标可视化看板</h2>
+            <div class="row">
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card">
+                        <i class="fas fa-chart-line fa-2x text-primary mb-3"></i>
+                        <div class="stat-value">121.02</div>
+                        <div class="stat-label">万亿元 GDP总量</div>
+                        <div class="text-success small mt-2">
+                            <i class="fas fa-arrow-up"></i> 比去年增长5.2%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card">
+                        <i class="fas fa-industry fa-2x text-primary mb-3"></i>
+                        <div class="stat-value">39.9%</div>
+                        <div class="stat-label">第二产业占比</div>
+                        <div class="text-warning small mt-2">
+                            <i class="fas fa-minus"></i> 比去年下降0.5%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card">
+                        <i class="fas fa-shopping-cart fa-2x text-primary mb-3"></i>
+                        <div class="stat-value">44.1</div>
+                        <div class="stat-label">万亿元 社会消费品零售总额</div>
+                        <div class="text-success small mt-2">
+                            <i class="fas fa-arrow-up"></i> 比去年增长7.2%
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card">
+                        <i class="fas fa-user-tie fa-2x text-primary mb-3"></i>
+                        <div class="stat-value">7.69</div>
+                        <div class="stat-label">亿人 城镇就业人口</div>
+                        <div class="text-success small mt-2">
+                            <i class="fas fa-arrow-up"></i> 比去年增加0.11亿
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <canvas id="industryChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>统计年鉴智能分析助手</h5>
+                    <p>基于多模态大模型的政府统计数据分析系统，助力宏观经济决策与产业研究。</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>快速链接</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-light">首页</a></li>
+                        <li><a href="#features" class="text-light">功能特色</a></li>
+                        <li><a href="#analysis" class="text-light">数据分析</a></li>
+                        <li><a href="#ai-chat" class="text-light">AI助手</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>联系我们</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-envelope me-2"></i> ai-invest@sinotrans.com</li>
+                        <li><i class="fas fa-phone me-2"></i> 400-123-4567</li>
+                        <li><i class="fas fa-map-marker-alt me-2"></i> 广州市黄埔区外运大楼</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="mt-4 mb-4">
+            <div class="text-center">
+                <p>© 2025 外运智投 版权所有</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // SiliconFlow API配置
+        const SILICONFLOW_CONFIG = {
+            apiKey: "sk-hohovpqkhjduevkjivjkincnqcmfybmepzzfmtkshmknhujn", // 请替换为您的实际API密钥
+            apiUrl: "https://api.siliconflow.cn/v1/chat/completions",
+            model: "deepseek-ai/DeepSeek-R1"
+        };
+        
+        let isGenerating = false;
+        let currentGeneration = null;
+        let currentController = null;
+        
+        // 初始化图表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 趋势图
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            const trendChart = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022'],
+                    datasets: [{
+                        label: 'GDP总量（万亿元）',
+                        data: [59.3, 64.4, 68.9, 74.6, 83.2, 91.9, 99.1, 101.4, 114.9, 121.0],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '近十年中国GDP增长趋势'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+            
+            // 区域对比图
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            const comparisonChart = new Chart(comparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['广东', '江苏', '山东', '浙江', '河南', '四川', '湖北', '福建'],
+                    datasets: [{
+                        label: '2022年GDP（万亿元）',
+                        data: [12.9, 12.3, 8.7, 7.8, 6.1, 5.7, 5.4, 5.3],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(241, 196, 15, 0.7)',
+                            'rgba(230, 126, 34, 0.7)',
+                            'rgba(231, 76, 60, 0.7)',
+                            'rgba(149, 165, 166, 0.7)',
+                            'rgba(26, 188, 156, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(52, 152, 219)',
+                            'rgb(46, 204, 113)',
+                            'rgb(155, 89, 182)',
+                            'rgb(241, 196, 15)',
+                            'rgb(230, 126, 34)',
+                            'rgb(231, 76, 60)',
+                            'rgb(149, 165, 166)',
+                            'rgb(26, 188, 156)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '2022年各省GDP对比'
+                        }
+                    }
+                }
+            });
+            
+            // 饼图
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            const pieChart = new Chart(pieCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['第一产业', '第二产业', '第三产业'],
+                    datasets: [{
+                        data: [7.3, 39.9, 52.8],
+                        backgroundColor: [
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(155, 89, 182, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(46, 204, 113)',
+                            'rgb(52, 152, 219)',
+                            'rgb(155, 89, 182)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '2022年三次产业占比'
+                        },
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+            
+            // 柱状图
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            const barChart = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['农林牧渔', '制造业', '建筑业', '批发零售', '金融业', '房地产业', '信息技术'],
+                    datasets: [{
+                        label: '增加值（万亿元）',
+                        data: [8.3, 33.5, 8.0, 11.5, 9.6, 7.4, 4.9],
+                        backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                        borderColor: 'rgb(52, 152, 219)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '2022年主要行业增加值'
+                        }
+                    }
+                }
+            });
+            
+            // 产业分布图
+            const industryCtx = document.getElementById('industryChart').getContext('2d');
+            const industryChart = new Chart(industryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['传统产业', '高新技术产业', '现代服务业', '基础设施', '其他'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: [
+                            'rgba(52, 152, 219, 0.7)',
+                            'rgba(46, 204, 113, 0.7)',
+                            'rgba(155, 89, 182, 0.7)',
+                            'rgba(241, 196, 15, 0.7)',
+                            'rgba(230, 126, 34, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgb(52, 152, 219)',
+                            'rgb(46, 204, 113)',
+                            'rgb(155, 89, 182)',
+                            'rgb(241, 196, 15)',
+                            'rgb(230, 126, 34)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '固定资产投资产业分布'
+                        }
+                    }
+                }
+            });
+            
+            // 预测图
+            const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+            const forecastChart = new Chart(forecastCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025'],
+                    datasets: [{
+                        label: '实际GDP',
+                        data: [101.4, 114.9, 121.0, null, null, null],
+                        borderColor: '#3498db',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#3498db',
+                        fill: false
+                    }, {
+                        label: '预测GDP',
+                        data: [null, null, 121.0, 128.5, 136.2, 144.5],
+                        borderColor: '#e74c3c',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        pointBackgroundColor: '#e74c3c',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'GDP实际值与预测值（万亿元）'
+                        }
+                    }
+                }
+            });
+            
+            // AI聊天功能
+            const chatContainer = document.getElementById('chatContainer');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendMessage');
+            const smartSearchBtn = document.getElementById('smartSearchBtn');
+            const searchInput = document.getElementById('searchInput');
+            const apiStatus = document.getElementById('apiStatus');
+            const apiStatusText = document.getElementById('apiStatusText');
+            
+            // 为智能检索按钮添加事件
+            smartSearchBtn.addEventListener('click', function() {
+                const query = searchInput.value.trim();
+                if (query) {
+                    // 发送消息到AI对话
+                    sendMessageToChat(query);
+                    // 清空搜索框
+                    searchInput.value = '';
+                }
+            });
+            
+            // 为搜索框添加回车键支持
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    smartSearchBtn.click();
+                }
+            });
+            
+            // 为所有搜索标签添加点击事件
+            document.querySelectorAll('.search-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    const query = this.getAttribute('data-query');
+                    if (query) {
+                        // 如果是在首页，填充搜索框
+                        if (this.closest('.hero-section')) {
+                            searchInput.value = query;
+                        } else {
+                            // 直接发送消息
+                            sendMessageToChat(query);
+                        }
+                    }
+                });
+            });
+            
+            // AI对话发送按钮事件
+            sendButton.addEventListener('click', function() {
+                const message = messageInput.value.trim();
+                if (message) {
+                    sendMessageToChat(message);
+                    messageInput.value = '';
+                }
+            });
+            
+            // AI对话输入框回车事件
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendButton.click();
+                }
+            });
+            
+            // 发送消息到聊天窗口的函数
+            async function sendMessageToChat(messageText) {
+                // 添加用户消息
+                addUserMessage(messageText);
+                
+                // 显示AI思考中
+                const aiMessageElement = addThinkingMessage();
+                
+                // 调用SiliconFlow API
+                await callSiliconFlowAPI(messageText, aiMessageElement);
+            }
+            
+            function addUserMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message-container user-message-container';
+                messageDiv.innerHTML = `
+                    <div class="message-content user-message-content">
+                        <div class="message-bubble user-bubble">
+                            ${text}
+                        </div>
+                    </div>
+                    <div class="message-avatar user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                `;
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            function addThinkingMessage() {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message-container ai-message-container';
+                messageDiv.innerHTML = `
+                    <div class="message-avatar ai-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content ai-message-content">
+                        <div class="thinking-indicator">
+                            <span>正在思考</span>
+                            <div class="thinking-dots">
+                                <div class="thinking-dot"></div>
+                                <div class="thinking-dot"></div>
+                                <div class="thinking-dot"></div>
+                            </div>
+                        </div>
+                        <div class="message-bubble ai-bubble" id="aiResponseText"></div>
+                    </div>
+                `;
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                return messageDiv;
+            }
+            
+            async function callSiliconFlowAPI(userMessage, messageElement) {
+                isGenerating = true;
+                updateSendButton();
+                updateApiStatus('connecting', '连接中...');
+                
+                currentController = new AbortController();
+                const signal = currentController.signal;
+                
+                try {
+                    const response = await fetch(SILICONFLOW_CONFIG.apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${SILICONFLOW_CONFIG.apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: SILICONFLOW_CONFIG.model,
+                            messages: [
+                                {
+                                    role: 'user',
+                                    content: userMessage
+                                }
+                            ],
+                            stream: true,
+                            temperature: 0.7,
+                            max_tokens: 2000
+                        }),
+                        signal: signal
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API请求失败: ${response.status}`);
+                    }
+                    
+                    updateApiStatus('connected', '您的贴心助手24小时在线');
+                    
+                    const reader = response.body.getReader();
+                    const decoder = new TextDecoder();
+                    let accumulatedText = '';
+                    
+                    // 清除思考指示器
+                    messageElement.querySelector('.thinking-indicator').style.display = 'none';
+                    const textElement = messageElement.querySelector('#aiResponseText');
+                    
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        
+                        if (done) {
+                            break;
+                        }
+                        
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+                        
+                        for (const line of lines) {
+                            if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+                                try {
+                                    const data = JSON.parse(line.slice(6));
+                                    if (data.choices && data.choices[0].delta.content) {
+                                        accumulatedText += data.choices[0].delta.content;
+                                        textElement.innerHTML = marked.parse(accumulatedText);
+                                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                                    }
+                                } catch (e) {
+                                    // 忽略解析错误
+                                }
+                            }
+                        }
+                    }
+                    
+                    isGenerating = false;
+                    updateSendButton();
+                    
+                    // 添加操作按钮
+                    addActionButtons(messageElement);
+                    
+                } catch (error) {
+                    if (error.name === 'AbortError') {
+                        messageElement.querySelector('#aiResponseText').innerHTML = marked.parse('生成已停止。');
+                    } else {
+                        console.error('API调用错误:', error);
+                        updateApiStatus('error', 'API连接错误');
+                        messageElement.querySelector('#aiResponseText').innerHTML = marked.parse('抱歉，发生了错误：' + error.message);
+                    }
+                    
+                    isGenerating = false;
+                    updateSendButton();
+                    
+                    // 添加操作按钮
+                    addActionButtons(messageElement);
+                }
+            }
+            
+            function stopGeneration() {
+                if (currentController) {
+                    currentController.abort();
+                    isGenerating = false;
+                    updateSendButton();
+                    updateApiStatus('connected', '您的贴心助手24小时在线');
+                }
+            }
+            
+            function updateSendButton() {
+                const sendButton = document.getElementById('sendMessage');
+                if (isGenerating) {
+                    sendButton.innerHTML = '<i class="fas fa-stop"></i> 停止';
+                    sendButton.classList.remove('btn-primary');
+                    sendButton.classList.add('btn-stop');
+                    sendButton.onclick = stopGeneration;
+                } else {
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i> 发送';
+                    sendButton.classList.remove('btn-stop');
+                    sendButton.classList.add('btn-primary');
+                    sendButton.onclick = function() {
+                        const message = messageInput.value.trim();
+                        if (message) {
+                            sendMessageToChat(message);
+                            messageInput.value = '';
+                        }
+                    };
+                }
+            }
+            
+            function updateApiStatus(status, text) {
+                const statusIndicator = document.getElementById('apiStatus');
+                const statusText = document.getElementById('apiStatusText');
+                
+                statusIndicator.className = 'status-indicator';
+                if (status === 'connecting') {
+                    statusIndicator.classList.add('connecting');
+                } else if (status === 'error') {
+                    statusIndicator.classList.add('error');
+                }
+                
+                statusText.textContent = text;
+            }
+            
+            function addActionButtons(messageElement) {
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'message-actions';
+                actionsDiv.innerHTML = `
+                    <div class="message-action" onclick="copyMessage(this)">
+                        <i class="far fa-copy"></i>
+                        <span>复制</span>
+                    </div>
+                    <div class="message-action">
+                        <i class="far fa-thumbs-up"></i>
+                        <span>点赞</span>
+                    </div>
+                    <div class="message-action">
+                        <i class="far fa-thumbs-down"></i>
+                        <span>点踩</span>
+                    </div>
+                    <div class="message-action">
+                        <i class="fas fa-redo"></i>
+                        <span>重新生成</span>
+                    </div>
+                    <div class="message-action">
+                        <i class="fas fa-expand"></i>
+                        <span>展开</span>
+                    </div>
+                `;
+                
+                messageElement.querySelector('.message-content').appendChild(actionsDiv);
+            }
+            
+            // 复制消息功能
+            window.copyMessage = function(element) {
+                const messageText = element.closest('.message-container').querySelector('.message-bubble').textContent;
+                navigator.clipboard.writeText(messageText).then(() => {
+                    // 显示复制成功提示
+                    const originalText = element.querySelector('span').textContent;
+                    element.querySelector('span').textContent = '已复制';
+                    setTimeout(() => {
+                        element.querySelector('span').textContent = originalText;
+                    }, 2000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>投资制度与风控指标AI助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #34a853;
+            --accent-color: #fbbc05;
+            --background-color: #f8f9fa;
+            --card-color: #ffffff;
+            --text-color: #202124;
+            --border-radius: 12px;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --deepseek-blue: #1a73e8;
+            --deepseek-light: #e8f0fe;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--deepseek-blue), #0d47a1);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        nav a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            padding: 3rem 0;
+            text-align: center;
+            background-color: var(--card-color);
+            margin-bottom: 2rem;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .hero h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            color: var(--deepseek-blue);
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: #5f6368;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background-color: var(--deepseek-blue);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .cta-button:hover {
+            background-color: #0d47a1;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .sidebar {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            height: fit-content;
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 1rem;
+            color: var(--deepseek-blue);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+        }
+        
+        .category-list {
+            list-style: none;
+        }
+        
+        .category-list li {
+            margin-bottom: 0.8rem;
+            padding: 0.8rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .category-list li:hover {
+            background-color: var(--deepseek-light);
+        }
+        
+        .category-list li.active {
+            background-color: var(--deepseek-light);
+            color: var(--deepseek-blue);
+            font-weight: 500;
+        }
+        
+        .chat-container {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+        
+        .chat-header {
+            background-color: var(--deepseek-blue);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .message {
+            max-width: 85%;
+            padding: 1rem 1.2rem;
+            border-radius: 18px;
+            line-height: 1.5;
+            position: relative;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--deepseek-blue);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .ai-message {
+            align-self: flex-start;
+            background-color: #f1f3f4;
+            border-bottom-left-radius: 4px;
+            /* display: flex; */
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .error-message {
+            align-self: flex-start;
+            background-color: #ffebee;
+            border-bottom-left-radius: 4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            border-left: 4px solid #f44336;
+        }
+        
+        .ai-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--deepseek-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        
+        .error-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: #f44336;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+        
+        .message-content {
+            /* white-space: pre-wrap; */
+            flex: 1;
+        }
+        
+        .message-content code {
+            background-color: rgba(0,0,0,0.05);
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .message-content pre {
+            background-color: #f6f8fa;
+            border-radius: 6px;
+            padding: 12px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .message-content table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .message-content th, .message-content td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .message-content th {
+            background-color: #f2f2f2;
+        }
+        
+        .message-content blockquote {
+            border-left: 4px solid var(--deepseek-blue);
+            padding-left: 12px;
+            margin: 10px 0;
+            color: #5f6368;
+            font-style: italic;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .message-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            justify-content: flex-end;
+        }
+        
+        .message-action {
+            background: none;
+            border: none;
+            color: #5f6368;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.3s;
+        }
+        
+        .message-action:hover {
+            color: var(--deepseek-blue);
+        }
+        
+        .ai-notice {
+            font-size: 0.75rem;
+            color: #5f6368;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center;
+        }
+        
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 1px solid #e0e0e0;
+            background-color: var(--card-color);
+        }
+        
+        .chat-input {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            background: #f8f9fa;
+            border: 1px solid #dadce0;
+            border-radius: 24px;
+            padding: 8px 15px;
+            transition: box-shadow 0.3s;
+        }
+        
+        .chat-input:focus-within {
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+        
+        .chat-input textarea {
+            flex: 1;
+            border: none;
+            outline: none;
+            resize: none;
+            font-size: 1rem;
+            line-height: 1.5;
+            background: transparent;
+            max-height: 120px;
+            padding: 8px 0;
+        }
+        
+        .chat-input-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .chat-input button {
+            background-color: var(--deepseek-blue);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chat-input button:hover {
+            background-color: #0d47a1;
+        }
+        
+        .chat-input button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .chat-input button.stop {
+            background-color: #ea4335;
+        }
+        
+        .chat-input button.stop:hover {
+            background-color: #d33426;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--deepseek-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: var(--deepseek-blue);
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-section a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-section a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #555;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+        
+        /* 加载动画 */
+        .typing-indicator {
+            display: inline-block;
+            background-color: #f1f3f4;
+            border-radius: 18px;
+            padding: 12px 18px;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #5f6368;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-indicator span:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        /* 平滑滚动 */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* 高亮效果 */
+        .highlight {
+            animation: highlight 2s ease;
+        }
+        
+        @keyframes highlight {
+            0% {
+                background-color: rgba(26, 115, 232, 0.2);
+            }
+            100% {
+                background-color: transparent;
+            }
+        }
+        
+        /* 流式响应效果 */
+        .streaming-cursor::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* 建议问题样式 */
+        .suggested-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .suggested-question {
+            background: #e8f0fe;
+            color: var(--deepseek-blue);
+            border: 1px solid #d2e3fc;
+            border-radius: 16px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .suggested-question:hover {
+            background: #d2e3fc;
+        }
+        
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">💼</span>
+                    <h1>投资制度与风控指标AI助手</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#chat" class="chat-link">AI咨询</a></li>
+                        <li><a href="#knowledge">知识库</a></li>
+                        <li><a href="#tools">测算工具</a></li>
+                        <li><a href="#about">关于我们</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container">
+            <h2>专业投资制度与风控指标AI咨询平台</h2>
+            <p>基于最新政策与行业实践，提供精准的投资制度解读、测算规则解析与风控指标分析，助力您的投资决策与合规管理。</p>
+            <button class="cta-button" id="start-consult">开始咨询</button>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>咨询分类</h3>
+                <ul class="category-list">
+                    <li class="active"><i class="fas fa-file-contract"></i>制度条款解读</li>
+                    <li><i class="fas fa-crosshairs"></i>适用范围说明</li>
+                    <li><i class="fas fa-calculator"></i>投资测算模型</li>
+                    <li><i class="fas fa-shield-alt"></i>风控指标解释</li>
+                    <li><i class="fas fa-tasks"></i>合规操作指引</li>
+                    <li><i class="fas fa-chart-bar"></i>案例参考分析</li>
+                    <li><i class="fas fa-sync-alt"></i>政策更新追踪</li>
+                    <li><i class="fas fa-balance-scale"></i>风险评估方法</li>
+                </ul>
+                
+                <!-- <div style="margin-top: 20px;">
+                    <h3>建议问题</h3>
+                    <div class="suggested-questions">
+                        <div class="suggested-question" data-question="请解释一下VaR风险指标">VaR风险指标</div>
+                        <div class="suggested-question" data-question="投资测算中的NPV和IRR有什么区别">NPV vs IRR</div>
+                        <div class="suggested-question" data-question="什么是最大回撤指标">最大回撤</div>
+                        <div class="suggested-question" data-question="如何计算夏普比率">夏普比率</div>
+                    </div>
+                </div> -->
+            </div>
+            
+            <div class="chat-container" id="chat">
+                <div class="chat-header">
+                    <i class="fas fa-robot"></i>
+                    AI投资顾问 - 在线解答您的投资制度与风控问题
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message ai-message">
+                        <div class="ai-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            您好！我是投资制度与风控指标AI助手。我可以为您解答关于投资制度、测算规则、风控指标、合规操作等方面的问题。请问有什么可以帮您的？
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <div class="chat-input">
+                        <textarea id="user-input" placeholder="请输入您的问题..." rows="1"></textarea>
+                        <div class="chat-input-actions">
+                            <button id="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features" id="knowledge">
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>投资测算模型</h3>
+                <p>提供多种投资测算模型与指标解释，包括NPV、IRR、ROI等关键指标的计算方法与适用场景。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3>制度条款解读</h3>
+                <p>深度解读各类投资制度条款，明确适用范围与执行标准，帮助您准确把握政策要求。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>风控指标分析</h3>
+                <p>全面解析各类风控指标，包括VaR、最大回撤、夏普比率等，助力风险识别与管理。</p>
+            </div>
+        </div>
+    </div>
+
+    <footer id="about">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>快速链接</h3>
+                    <ul>
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#chat" class="chat-link">AI咨询</a></li>
+                        <li><a href="#knowledge">知识库</a></li>
+                        <li><a href="#tools">测算工具</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>服务内容</h3>
+                    <ul>
+                        <li><a href="#">制度条款解读</a></li>
+                        <li><a href="#">投资测算模型</a></li>
+                        <li><a href="#">风控指标解释</a></li>
+                        <li><a href="#">合规操作指引</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>联系我们</h3>
+                    <ul>
+                        <li>邮箱: ai-invest@sinotrans.com</li>
+                        <li>电话: 400-123-4567</li>
+                        <li>地址: 广州市黄埔区外运大楼</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                &copy; 2023 投资制度与风控指标AI助手 版权所有
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // SiliconFlow API配置
+        const SILICONFLOW_API_KEY = "sk-hohovpqkhjduevkjivjkincnqcmfybmepzzfmtkshmknhujn"; // 请替换为您的实际API密钥
+        const SILICONFLOW_API_URL = "https://api.siliconflow.cn/v1/chat/completions";
+        const MODEL_NAME = "deepseek-ai/DeepSeek-R1";
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chat-messages');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            const startConsultBtn = document.getElementById('start-consult');
+            const chatLinks = document.querySelectorAll('.chat-link');
+            const suggestedQuestions = document.querySelectorAll('.suggested-question');
+            
+            // 对话状态
+            let isStreaming = false;
+            let abortController = null;
+            
+            // 配置Markdown解析器
+            marked.setOptions({
+                highlight: function(code, lang) {
+                    if (lang && hljs.getLanguage(lang)) {
+                        return hljs.highlight(code, { language: lang }).value;
+                    }
+                    return hljs.highlightAuto(code).value;
+                },
+                breaks: true,
+                gfm: true
+            });
+            
+            // 开始咨询按钮点击事件
+            startConsultBtn.addEventListener('click', function() {
+                scrollToChat();
+                focusInput();
+            });
+            
+            // 导航栏聊天链接点击事件
+            chatLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    scrollToChat();
+                    focusInput();
+                });
+            });
+            
+            // 建议问题点击事件
+            suggestedQuestions.forEach(question => {
+                question.addEventListener('click', function() {
+                    const questionText = this.getAttribute('data-question');
+                    userInput.value = questionText;
+                    focusInput();
+                });
+            });
+            
+            // 自动调整输入框高度
+            userInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+            
+            // 发送消息函数
+            async function sendMessage() {
+                const message = userInput.value.trim();
+                if (message === '' || isStreaming) return;
+                
+                // 添加用户消息
+                addMessage(message, 'user');
+                userInput.value = '';
+                userInput.style.height = 'auto';
+                
+                // 禁用输入和按钮
+                userInput.disabled = true;
+                sendBtn.disabled = true;
+                
+                // 显示AI正在输入
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'message ai-message typing-indicator';
+                typingIndicator.innerHTML = `
+                    <div class="ai-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <span></span><span></span><span></span>
+                    </div>
+                `;
+                chatMessages.appendChild(typingIndicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // 创建AbortController用于停止生成
+                abortController = new AbortController();
+                
+                try {
+                    // 调用SiliconFlow API
+                    const response = await callSiliconFlowAPI(message, abortController.signal);
+                    
+                    // 移除输入指示器
+                    chatMessages.removeChild(typingIndicator);
+                    
+                    // 流式输出AI回复
+                    await streamAIReply(response);
+                } catch (error) {
+                    // 移除输入指示器
+                    if (chatMessages.contains(typingIndicator)) {
+                        chatMessages.removeChild(typingIndicator);
+                    }
+                    
+                    // 显示错误消息
+                    addErrorMessage("抱歉，发生错误：" + error.message);
+                    console.error("API调用错误:", error);
+                } finally {
+                    // 恢复输入和按钮状态
+                    userInput.disabled = false;
+                    sendBtn.disabled = false;
+                    isStreaming = false;
+                    abortController = null;
+                    
+                    // 恢复发送按钮
+                    sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                    sendBtn.classList.remove('stop');
+                }
+            }
+            
+            // 调用SiliconFlow API
+            async function callSiliconFlowAPI(message, signal) {
+                const requestBody = {
+                    model: MODEL_NAME,
+                    messages: [
+                        {
+                            role: "user",
+                            content: message
+                        }
+                    ],
+                    stream: true,
+                    temperature: 0.7,
+                    max_tokens: 2048
+                };
+                
+                const response = await fetch(SILICONFLOW_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SILICONFLOW_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody),
+                    signal: signal
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status} ${response.statusText}`);
+                }
+                
+                return response;
+            }
+            
+            // 流式输出AI回复
+            async function streamAIReply(response) {
+                isStreaming = true;
+                
+                // 创建AI消息元素
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message ai-message';
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'ai-avatar';
+                avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
+                messageDiv.appendChild(avatarDiv);
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content streaming-cursor';
+                messageDiv.appendChild(contentDiv);
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let accumulatedText = '';
+                
+                try {
+                    while (true) {
+                        const { done, value } = await reader.read();
+                        if (done) break;
+                        
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+                        
+                        for (const line of lines) {
+                            if (line.startsWith('data: ') && !line.includes('[DONE]')) {
+                                try {
+                                    const data = JSON.parse(line.slice(6));
+                                    if (data.choices && data.choices[0].delta.content) {
+                                        accumulatedText += data.choices[0].delta.content;
+                                        
+                                        // 使用Markdown渲染
+                                        const renderedContent = marked.parse(accumulatedText);
+                                        contentDiv.innerHTML = renderedContent + '<span class="streaming-cursor"></span>';
+                                        
+                                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                                    }
+                                } catch (e) {
+                                    // 忽略JSON解析错误
+                                }
+                            }
+                        }
+                    }
+                } finally {
+                    reader.releaseLock();
+                }
+                
+                // 完成流式输出，移除光标
+                contentDiv.innerHTML = marked.parse(accumulatedText);
+                contentDiv.classList.remove('streaming-cursor');
+                
+                // 添加消息操作区域
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'message-actions';
+                actionsDiv.innerHTML = `
+                    <button class="message-action" title="复制"><i class="fas fa-copy"></i></button>
+                    <button class="message-action" title="点赞"><i class="fas fa-thumbs-up"></i></button>
+                    <button class="message-action" title="点踩"><i class="fas fa-thumbs-down"></i></button>
+                    <button class="message-action" title="重新生成"><i class="fas fa-redo"></i></button>
+                    <button class="message-action" title="分享"><i class="fas fa-share"></i></button>
+                `;
+                messageDiv.appendChild(actionsDiv);
+                
+                // 添加AI内容提示
+                const noticeDiv = document.createElement('div');
+                noticeDiv.className = 'ai-notice';
+                noticeDiv.textContent = 'AI生成内容可能存在不准确之处，请仔细甄别并参考官方文件';
+                messageDiv.appendChild(noticeDiv);
+                
+                // 添加消息操作功能
+                addMessageActions(messageDiv);
+            }
+            
+            // 停止生成函数
+            function stopGeneration() {
+                if (abortController) {
+                    abortController.abort();
+                    isStreaming = false;
+                    
+                    // 恢复发送按钮
+                    sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                    sendBtn.classList.remove('stop');
+                    
+                    // 恢复输入
+                    userInput.disabled = false;
+                }
+            }
+            
+            // 添加消息到聊天窗口
+            function addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}-message`;
+                
+                if (sender === 'ai') {
+                    const avatarDiv = document.createElement('div');
+                    avatarDiv.className = 'ai-avatar';
+                    avatarDiv.innerHTML = '<i class="fas fa-robot"></i>';
+                    messageDiv.appendChild(avatarDiv);
+                    
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'message-content';
+                    contentDiv.innerHTML = marked.parse(text);
+                    messageDiv.appendChild(contentDiv);
+                    
+                    // 添加消息操作区域
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'message-actions';
+                    actionsDiv.innerHTML = `
+                        <button class="message-action" title="复制"><i class="fas fa-copy"></i></button>
+                        <button class="message-action" title="点赞"><i class="fas fa-thumbs-up"></i></button>
+                        <button class="message-action" title="点踩"><i class="fas fa-thumbs-down"></i></button>
+                        <button class="message-action" title="重新生成"><i class="fas fa-redo"></i></button>
+                        <button class="message-action" title="分享"><i class="fas fa-share"></i></button>
+                    `;
+                    messageDiv.appendChild(actionsDiv);
+                    
+                    // 添加AI内容提示
+                    const noticeDiv = document.createElement('div');
+                    noticeDiv.className = 'ai-notice';
+                    noticeDiv.textContent = 'AI生成内容可能存在不准确之处，请仔细甄别并参考官方文件';
+                    messageDiv.appendChild(noticeDiv);
+                    
+                    addMessageActions(messageDiv);
+                } else {
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'message-content';
+                    contentDiv.textContent = text;
+                    messageDiv.appendChild(contentDiv);
+                }
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // 添加错误消息到聊天窗口
+            function addErrorMessage(text) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message error-message';
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'error-avatar';
+                avatarDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                messageDiv.appendChild(avatarDiv);
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.textContent = text;
+                messageDiv.appendChild(contentDiv);
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // 添加消息操作功能
+            function addMessageActions(messageDiv) {
+                const copyBtn = messageDiv.querySelector('.message-action');
+                copyBtn.addEventListener('click', function() {
+                    const text = messageDiv.querySelector('.message-content').textContent;
+                    navigator.clipboard.writeText(text).then(() => {
+                        // 可以添加复制成功提示
+                        console.log('文本已复制到剪贴板');
+                    });
+                });
+            }
+            
+            // 滚动到聊天区域
+            function scrollToChat() {
+                document.getElementById('chat').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('chat').classList.add('highlight');
+                setTimeout(() => {
+                    document.getElementById('chat').classList.remove('highlight');
+                }, 2000);
+            }
+            
+            // 聚焦输入框
+            function focusInput() {
+                setTimeout(() => {
+                    userInput.focus();
+                }, 800);
+            }
+            
+            // 事件监听
+            sendBtn.addEventListener('click', function() {
+                if (isStreaming) {
+                    stopGeneration();
+                } else {
+                    sendMessage();
+                }
+            });
+            
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (isStreaming) {
+                        stopGeneration();
+                    } else {
+                        sendMessage();
+                    }
+                }
+            });
+            
+            // 分类点击事件
+            const categories = document.querySelectorAll('.category-list li');
+            categories.forEach(category => {
+                category.addEventListener('click', function(e) {
+                    e.preventDefault(); // 防止页面跳动
+                    
+                    categories.forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const categoryName = this.textContent.trim();
+                    const promptText = getPromptForCategory(categoryName);
+                    
+                    userInput.value = promptText;
+                    focusInput();
+                });
+            });
+            
+            // 获取分类对应的提示词
+            function getPromptForCategory(categoryName) {
+                const prompts = {
+                    "制度条款解读": "请详细解释投资管理制度中的关键条款，包括适用范围、执行标准和注意事项。",
+                    "适用范围说明": "请说明这项投资政策或制度的适用范围，包括适用对象、场景和例外情况。",
+                    "投资测算模型": "请介绍常用的投资测算模型，包括NPV、IRR、ROI等指标的计算方法和应用场景。",
+                    "风控指标解释": "请解释常见的风险控制指标，如VaR、最大回撤、夏普比率等的含义和计算方法。",
+                    "合规操作指引": "请提供合规操作的具体指引，包括操作流程、注意事项和常见错误。",
+                    "案例参考分析": "请提供一个相关的投资案例，并分析其中的关键问题和经验教训。",
+                    "政策更新追踪": "请介绍最新的投资政策变化，并分析对投资实践的影响。",
+                    "风险评估方法": "请介绍投资风险评估的常用方法和工具，以及如何应用它们。"
+                };
+                
+                return prompts[categoryName] || `我想了解关于${categoryName}的内容，请详细介绍。`;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深度分析平台 | AI驱动的客户与合作伙伴分析</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #34a853;
+            --accent-color: #fbbc05;
+            --danger-color: #ea4335;
+            --dark-color: #202124;
+            --light-color: #f8f9fa;
+            --gray-color: #5f6368;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* 导航栏 */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .logo-icon {
+            margin-right: 10px;
+            font-size: 28px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        
+        .auth-buttons {
+            display: flex;
+        }
+        
+        .btn {
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-login {
+            background: transparent;
+            border: 1px solid var(--gray-color);
+            color: var(--gray-color);
+            margin-right: 10px;
+        }
+        
+        .btn-signup {
+            background: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            color: white;
+        }
+        
+        .btn-login:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-signup:hover {
+            background: #0d62d9;
+        }
+        
+        /* 英雄区域 */
+        .hero {
+            padding: 80px 0;
+            text-align: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+        }
+        
+        .hero p {
+            font-size: 20px;
+            color: var(--gray-color);
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-color);
+            padding: 12px 30px;
+            border: 1px solid var(--primary-color);
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        /* 功能区域 */
+        .features {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .section-title h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+        
+        .section-title p {
+            color: var(--gray-color);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(26, 115, 232, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .feature-card p {
+            color: var(--gray-color);
+        }
+        
+        /* 可视化分析区域 */
+        .visualization {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+        }
+        
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .analytics-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .analytics-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .analytics-content {
+            padding: 20px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .analytics-image {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+        }
+        
+        /* AI对话区域 */
+        
+        /* AI对话区域 */
+        .ai-chat {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .section-title h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+        
+        .section-title p {
+            color: var(--gray-color);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .chat-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        
+        .chat-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .chat-messages {
+            height: 500px;
+            padding: 20px;
+            overflow-y: auto;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #f9f9f9;
+        }
+        
+        .message {
+            margin-bottom: 30px;
+            display: flex;
+        }
+        
+        .user-message {
+            justify-content: flex-end;
+        }
+        
+        .bot-message {
+            justify-content: flex-start;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            background: var(--primary-color);
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .user-message .message-avatar {
+            margin-right: 0;
+            margin-left: 15px;
+            background: var(--secondary-color);
+        }
+        
+        .message-content {
+            max-width: 70%;
+        }
+        
+        .user-message .message-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        
+        .message-bubble {
+            padding: 15px 20px;
+            border-radius: 18px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .user-message .message-bubble {
+            background: var(--primary-color);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .bot-message .message-bubble {
+            background: white;
+            color: var(--dark-color);
+            border: 1px solid var(--border-color);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message-actions {
+            display: flex;
+            margin-top: 10px;
+            gap: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .message:hover .message-actions {
+            opacity: 1;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--gray-color);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .action-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        .thinking {
+            display: flex;
+            align-items: center;
+            color: var(--gray-color);
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .thinking-dots {
+            display: inline-block;
+            margin-left: 5px;
+        }
+        
+        .thinking-dots span {
+            animation: thinking 1.5s infinite;
+            opacity: 0;
+        }
+        
+        .thinking-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .thinking-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes thinking {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        .chat-input-container {
+            display: flex;
+            padding: 20px;
+            background: white;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            outline: none;
+            font-size: 16px;
+            resize: none;
+            height: 60px;
+            line-height: 1.5;
+        }
+        
+        .chat-input:focus {
+            border-color: var(--primary-color);
+        }
+        
+        .send-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-self: flex-end;
+        }
+        
+        .send-btn:hover {
+            background: #0d62d9;
+        }
+        
+        .send-btn:disabled {
+            background: var(--gray-color);
+            cursor: not-allowed;
+        }
+        
+        .disclaimer {
+            padding: 15px 20px;
+            background: #fff8e6;
+            border-top: 1px solid #ffecb3;
+            color: var(--gray-color);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .disclaimer i {
+            color: var(--accent-color);
+        }
+        
+        
+        /* 数据可视化区域 */
+        .data-visualization {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .dashboard-card h3 {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .dashboard-card h3 i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background: #f5f7fa;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-color);
+            font-size: 14px;
+        }
+        
+        .metrics {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .metric {
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .metric-label {
+            font-size: 14px;
+            color: var(--gray-color);
+        }
+        
+        /* 页脚 */
+        footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column a {
+            color: #bdc1c6;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #3c4043;
+            color: #9aa0a6;
+            font-size: 14px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                padding: 15px 0;
+            }
+            
+            .nav-links {
+                margin: 20px 0;
+            }
+            
+            .nav-links li {
+                margin: 0 10px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-primary, .btn-outline {
+                width: 100%;
+                max-width: 300px;
+                margin-bottom: 10px;
+            }
+            
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <div class="logo">
+                    <span class="logo-icon">🧠</span>
+                    <span>客户与合作伙伴深度分析助手</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="#features">核心功能</a></li>
+                    <li><a href="#visualization">分析洞察</a></li>
+                    <li><a href="#ai-chat">AI分析</a></li>
+                    <li><a href="#data">数据看板</a></li>
+                </ul>
+                <!-- <div class="auth-buttons">
+                    <button class="btn btn-login">登录</button>
+                    <button class="btn btn-signup">免费试用</button>
+                </div> -->
+            </nav>
+        </div>
+    </header>
+
+    <!-- 英雄区域 -->
+    <section class="hero">
+        <div class="container">
+            <h1>深度分析客户与合作伙伴行为模式</h1>
+            <p>利用AI技术识别潜在需求与风险，优化合作策略与客户服务，提升业务价值</p>
+            <div class="hero-buttons">
+               <button class="btn-primary" id="start-analysis">开始免费分析</button>
+                <button class="btn-outline">查看演示</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 功能区域 -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>核心分析功能</h2>
+                <p>全方位洞察客户与合作伙伴，驱动业务决策</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-chart"></i>
+                    </div>
+                    <h3>客户画像与行为分析</h3>
+                    <p>深度分析客户行为模式，构建360度客户画像，识别关键行为特征与偏好。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>合作伙伴风险评估</h3>
+                    <p>全面评估合作伙伴的财务、运营与合规风险，保障合作安全与稳定。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>需求预测与个性化服务</h3>
+                    <p>基于历史数据与行为模式，预测客户需求，提供精准个性化服务方案。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <h3>关系网络价值挖掘</h3>
+                    <p>分析客户与合作伙伴的关系网络，识别关键节点与潜在合作机会。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h3>合作策略优化</h3>
+                    <p>基于数据分析结果，动态调整合作策略，最大化合作关系价值。</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>风险预警系统</h3>
+                    <p>实时监测客户与合作伙伴动态，及时发现潜在风险并发出预警。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 可视化分析区域 -->
+    <section class="visualization" id="visualization">
+        <div class="container">
+            <div class="section-title">
+                <h2>分析洞察可视化</h2>
+                <p>直观呈现关键分析结果，洞察客户行为与合作伙伴风险</p>
+            </div>
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <div class="analytics-header">
+                        <h3>客户行为分析</h3>
+                    </div>
+                    <div class="analytics-content">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="客户行为分析" class="analytics-image">
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-header">
+                        <h3>合作伙伴风险评估</h3>
+                    </div>
+                    <div class="analytics-content">
+                        <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1169&q=80" alt="合作伙伴风险评估" class="analytics-image">
+                    </div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-header">
+                        <h3>需求预测分析</h3>
+                    </div>
+                    <div class="analytics-content">
+                        <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="需求预测分析" class="analytics-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+     <!-- AI对话区域 -->
+     <!-- AI对话区域 -->
+    <section class="ai-chat" id="ai-chat">
+        <div class="container">
+            <div class="section-title">
+                <h2>AI深度分析助手</h2>
+                <p>与AI对话，获取深入的客户与合作伙伴洞察</p>
+            </div>
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3>深度分析AI助手</h3>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message bot-message">
+                        <div class="message-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="message-content">
+                            <div class="message-bubble">
+                                您好！我是深度分析AI助手。我可以帮助您分析客户行为、评估合作伙伴风险、预测需求趋势等。请告诉我您想了解什么？
+                            </div>
+                            <div class="message-actions">
+                                <button class="action-btn"><i class="fas fa-copy"></i> 复制</button>
+                                <button class="action-btn"><i class="fas fa-thumbs-up"></i> 赞</button>
+                                <button class="action-btn"><i class="fas fa-thumbs-down"></i> 踩</button>
+                                <button class="action-btn"><i class="fas fa-share"></i> 分享</button>
+                                <button class="action-btn"><i class="fas fa-ellipsis-h"></i> 更多</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <textarea class="chat-input" id="user-input" placeholder="输入您的问题..."></textarea>
+                    <button class="send-btn" id="send-btn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <!-- <div class="disclaimer">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>AI生成内容可能存在不准确信息，请仔细甄别并参考多方来源</span>
+                </div> -->
+            </div>
+        </div>
+    </section>
+
+
+    <!-- 数据可视化区域 -->
+    <section class="data-visualization" id="data">
+        <div class="container">
+            <div class="section-title">
+                <h2>数据洞察与可视化</h2>
+                <p>直观呈现客户与合作伙伴的关键指标与趋势</p>
+            </div>
+            <div class="dashboard">
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-chart-bar"></i> 客户行为分析</h3>
+                    <div class="chart-placeholder">
+                        <canvas id="behaviorChart"></canvas>
+                    </div>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">78%</div>
+                            <div class="metric-label">活跃客户</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">23%</div>
+                            <div class="metric-label">复购率</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">12%</div>
+                            <div class="metric-label">流失风险</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-search"></i> 合作伙伴风险评估</h3>
+                    <div class="chart-placeholder">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">15</div>
+                            <div class="metric-label">低风险</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">8</div>
+                            <div class="metric-label">中风险</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">3</div>
+                            <div class="metric-label">高风险</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3><i class="fas fa-chart-line"></i> 需求预测</h3>
+                    <div class="chart-placeholder">
+                        <canvas id="forecastChart"></canvas>
+                    </div>
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-value">+18%</div>
+                            <div class="metric-label">下季度需求</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">92%</div>
+                            <div class="metric-label">预测准确率</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">5</div>
+                            <div class="metric-label">新兴需求点</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>深度分析平台</h3>
+                    <ul>
+                        <li><a href="#">关于我们</a></li>
+                        <li><a href="#">产品功能</a></li>
+                        <li><a href="#">解决方案</a></li>
+                        <li><a href="#">客户案例</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>资源中心</h3>
+                    <ul>
+                        <li><a href="#">帮助文档</a></li>
+                        <li><a href="#">API文档</a></li>
+                        <li><a href="#">行业报告</a></li>
+                        <li><a href="#">博客</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>法律条款</h3>
+                    <ul>
+                        <li><a href="#">隐私政策</a></li>
+                        <li><a href="#">服务条款</a></li>
+                        <li><a href="#">数据安全</a></li>
+                        <li><a href="#">合规声明</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>联系我们</h3>
+                    <ul>
+                        <li><a href="#">客服支持</a></li>
+                        <li><a href="#">商务合作</a></li>
+                        <li><a href="#">加入我们</a></li>
+                        <li><a href="#">意见反馈</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 外运智投 版权所有 </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+      
+
+      
+        // 图表初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 客户行为分析图表
+            const behaviorCtx = document.getElementById('behaviorChart').getContext('2d');
+            const behaviorChart = new Chart(behaviorCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                    datasets: [{
+                        label: '活跃客户数',
+                        data: [320, 450, 380, 520, 610, 730],
+                        backgroundColor: 'rgba(26, 115, 232, 0.7)',
+                        borderColor: 'rgba(26, 115, 232, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // 风险评估图表
+            const riskCtx = document.getElementById('riskChart').getContext('2d');
+            const riskChart = new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['低风险', '中风险', '高风险'],
+                    datasets: [{
+                        data: [15, 8, 3],
+                        backgroundColor: [
+                            'rgba(52, 168, 83, 0.7)',
+                            'rgba(251, 188, 5, 0.7)',
+                            'rgba(234, 67, 53, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(52, 168, 83, 1)',
+                            'rgba(251, 188, 5, 1)',
+                            'rgba(234, 67, 53, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+            
+            // 需求预测图表
+            const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+            const forecastChart = new Chart(forecastCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月'],
+                    datasets: [{
+                        label: '实际需求',
+                        data: [320, 450, 380, 520, 610, 730, null, null],
+                        borderColor: 'rgba(26, 115, 232, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    }, {
+                        label: '预测需求',
+                        data: [null, null, null, null, null, 730, 820, 890],
+                        borderColor: 'rgba(234, 67, 53, 1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+    
+    <script>
+        // 配置信息 - 在实际应用中，这些信息应该从安全的后端获取
+        const API_CONFIG = {
+            // SiliconFlow DeepSeek-R1 API配置
+            API_KEY: "sk-hohovpqkhjduevkjivjkincnqcmfybmepzzfmtkshmknhujn", // 替换为你的实际API密钥
+            API_URL: "https://api.siliconflow.cn/v1/chat/completions",
+            MODEL: "deepseek-ai/DeepSeek-R1"
+        };
+
+        // DOM元素
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const startAnalysisBtn = document.getElementById('start-analysis');
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 设置marked选项，用于Markdown解析
+            marked.setOptions({
+                breaks: true,
+                gfm: true,
+                tables: true
+            });
+
+            // 添加示例消息
+            // addExampleMessages();
+        });
+
+        // 添加示例消息
+        // function addExampleMessages() {
+        //     const examples = [
+        //         "请分析我们最近合作的供应商A的风险状况。",
+        //         "客户B最近三个月购买行为有什么变化？",
+        //         "预测下季度我们主要产品的需求趋势。"
+        //     ];
+
+        //     examples.forEach(example => {
+        //         setTimeout(() => {
+        //             addMessage(example, 'user');
+        //         }, 1000);
+        //     });
+        // }
+
+        // 发送消息事件监听
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        startAnalysisBtn.addEventListener('click', function() {
+            document.getElementById('ai-chat').scrollIntoView({ behavior: 'smooth' });
+            userInput.focus();
+        });
+
+        // 发送消息到AI
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            
+            if (message === '') return;
+            
+            // 添加用户消息
+            addMessage(message, 'user');
+            
+            // 清空输入框
+            userInput.value = '';
+            
+            // 禁用发送按钮
+            sendBtn.disabled = true;
+            
+            // 显示思考中
+            showThinkingIndicator();
+            
+            try {
+                // 调用SiliconFlow API
+                const response = await callSiliconFlowAPI(message);
+                
+                // 移除思考中指示器
+                removeThinkingIndicator();
+                
+                // 添加AI回复（逐字显示）
+                typewriterResponse(response, 'bot');
+            } catch (error) {
+                console.error('API调用错误:', error);
+                removeThinkingIndicator();
+                addMessage('抱歉，我现在无法处理您的请求。请稍后再试。', 'bot');
+                sendBtn.disabled = false;
+            }
+        }
+
+        // 调用SiliconFlow API
+        async function callSiliconFlowAPI(message) {
+            const requestBody = {
+                model: API_CONFIG.MODEL,
+                messages: [
+                    {
+                        role: "system",
+                        content: "你是一个专业的客户与合作伙伴行为分析专家。专注于分析客户画像、行为模式、合作伙伴风险评估、需求预测和关系网络价值挖掘。请用专业、详细的方式回答，适当使用表格和列表来呈现分析结果。"
+                    },
+                    {
+                        role: "user",
+                        content: message
+                    }
+                ],
+                stream: false,
+                max_tokens: 2048,
+                temperature: 0.7
+            };
+
+            const response = await fetch(API_CONFIG.API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_CONFIG.API_KEY}`
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error(`API请求失败: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.choices[0].message.content;
+        }
+
+        // 显示思考中指示器
+        function showThinkingIndicator() {
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.className = 'thinking';
+            thinkingDiv.id = 'thinking-indicator';
+            thinkingDiv.innerHTML = `
+                <div class="message-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        思考中<span class="thinking-dots"><span>.</span><span>.</span><span>.</span></span>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(thinkingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 移除思考中指示器
+        function removeThinkingIndicator() {
+            const thinkingIndicator = document.getElementById('thinking-indicator');
+            if (thinkingIndicator) {
+                thinkingIndicator.remove();
+            }
+        }
+
+        // 添加消息到聊天界面
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            const avatar = sender === 'user' 
+                ? `<div class="message-avatar"><i class="fas fa-user"></i></div>`
+                : `<div class="message-avatar"><i class="fas fa-robot"></i></div>`;
+            
+            // 解析Markdown
+            const formattedText = sender === 'bot' ? marked.parse(text) : text;
+            
+            messageDiv.innerHTML = `
+                ${sender === 'bot' ? avatar : ''}
+                <div class="message-content">
+                    <div class="message-bubble">${formattedText}</div>
+                    <div class="message-actions">
+                        <button class="action-btn" onclick="copyMessage(this)"><i class="fas fa-copy"></i> 复制</button>
+                        <button class="action-btn"><i class="fas fa-thumbs-up"></i> 赞</button>
+                        <button class="action-btn"><i class="fas fa-thumbs-down"></i> 踩</button>
+                        <button class="action-btn"><i class="fas fa-share"></i> 分享</button>
+                        <button class="action-btn"><i class="fas fa-ellipsis-h"></i> 更多</button>
+                    </div>
+                </div>
+                ${sender === 'user' ? avatar : ''}
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // 重新启用发送按钮
+            sendBtn.disabled = false;
+        }
+
+        // 逐字显示AI回复
+        function typewriterResponse(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            const avatar = `<div class="message-avatar"><i class="fas fa-robot"></i></div>`;
+            
+            messageDiv.innerHTML = `
+                ${avatar}
+                <div class="message-content">
+                    <div class="message-bubble" id="typewriter-output"></div>
+                    <div class="message-actions">
+                        <button class="action-btn" onclick="copyMessage(this)"><i class="fas fa-copy"></i> 复制</button>
+                        <button class="action-btn"><i class="fas fa-thumbs-up"></i> 赞</button>
+                        <button class="action-btn"><i class="fas fa-thumbs-down"></i> 踩</button>
+                        <button class="action-btn"><i class="fas fa-share"></i> 分享</button>
+                        <button class="action-btn"><i class="fas fa-ellipsis-h"></i> 更多</button>
+                    </div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            
+            const outputElement = document.getElementById('typewriter-output');
+            let index = 0;
+            
+            function typeWriter() {
+                if (index < text.length) {
+                    // 获取当前要添加的文本
+                    const currentText = text.substring(0, index + 1);
+                    
+                    // 解析Markdown并更新元素内容
+                    outputElement.innerHTML = marked.parse(currentText);
+                    
+                    index++;
+                    setTimeout(typeWriter, 20); // 调整速度
+                } else {
+                    // 完成后重新启用发送按钮
+                    sendBtn.disabled = false;
+                }
+                
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            typeWriter();
+        }
+
+        // 复制消息功能
+        function copyMessage(button) {
+            const messageBubble = button.closest('.message-content').querySelector('.message-bubble');
+            const textToCopy = messageBubble.innerText;
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // 显示复制成功反馈
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> 已复制';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+
+        // 模拟API响应（用于演示）
+        function getMockResponse(userMessage) {
+            // 根据用户消息内容返回不同的模拟响应
+            if (userMessage.includes('风险') || userMessage.includes('供应商')) {
+                return `根据我的分析，供应商A存在以下风险点：
+
+| 风险类型 | 风险等级 | 详细说明 |
+|---------|---------|---------|
+| 财务风险 | 中 | 近期现金流紧张，负债率上升15% |
+| 交付风险 | 高 | 过去三个月有3次延迟交付记录 |
+| 合规风险 | 中 | 有两项行业监管警告记录 |
+
+**建议措施：**
+1. 加强履约监督，建立备选供应商方案
+2. 要求提供更频繁的财务报告
+3. 考虑分期付款降低风险暴露
+
+如需更详细分析，请提供供应商的财务数据和合作历史。`;
+            } else if (userMessage.includes('客户') || userMessage.includes('行为')) {
+                return `客户B的行为分析显示以下关键模式：
+
+**购买行为变化：**
+- 过去三个月平均订单金额增长25%
+- 购买频率从每月1.5次增加到2.3次
+- 高价值产品购买比例从35%提升至52%
+
+**潜在需求预测：**
+基于行为模式，客户B可能对以下产品感兴趣：
+1. 高端定制解决方案
+2. 长期服务合约
+3. 配套增值服务
+
+**服务建议：**
+- 提供个性化产品推荐
+- 指派专属客户经理
+- 考虑VIP客户待遇`;
+            } else if (userMessage.includes('需求') || userMessage.includes('预测')) {
+                return `基于历史数据和市场趋势，我对下季度需求预测如下：
+
+| 产品类别 | 预测需求增长 | 关键驱动因素 |
+|---------|------------|------------|
+| 智能解决方案 | +18% | 数字化转型加速，竞争压力增大 |
+| 基础服务 | +8% | 市场稳定增长，客户基础扩大 |
+| 增值服务 | +25% | 客户对个性化服务需求增加 |
+
+**风险提示：**
+- 宏观经济波动可能影响预测准确性
+- 建议准备+/-5%的库存缓冲
+- 关注主要竞争对手的促销活动`;
+            } else {
+                return `我已经收到您的查询："${userMessage}"。
+
+作为深度分析AI助手，我可以帮助您：
+
+**核心分析能力：**
+- 🔍 客户画像与行为分析
+- ⚠️ 合作伙伴风险评估  
+- 📈 需求预测与趋势分析
+- 🔗 关系网络价值挖掘
+- 🛡️ 风险预警与防控建议
+
+请提供更具体的信息，我将为您提供专业的分析报告。例如：
+- 客户的基本信息和交易历史
+- 合作伙伴的财务和运营数据
+- 市场趋势和行业动态`;
+            }
+        }
+    </script>
+</body>
+</html>
